@@ -180,4 +180,53 @@
 
   window.addEventListener("scroll", highlightNav, { passive: true });
   highlightNav();
+
+  /* ============================================
+     CONTACT FORM — AJAX SUBMISSION VIA FORMSPREE
+     ============================================ */
+  var contactForm = document.getElementById("contact-form");
+
+  if (contactForm) {
+    contactForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      var submitBtn = contactForm.querySelector('button[type="submit"]');
+      var successMsg = contactForm.querySelector(".form-success");
+      var originalText = submitBtn.textContent;
+
+      submitBtn.textContent = "Sending...";
+      submitBtn.disabled = true;
+
+      fetch(contactForm.action, {
+        method: "POST",
+        body: new FormData(contactForm),
+        headers: { Accept: "application/json" },
+      })
+        .then(function (response) {
+          if (response.ok) {
+            contactForm.reset();
+            successMsg.style.display = "block";
+            submitBtn.textContent = "Sent!";
+            setTimeout(function () {
+              successMsg.style.display = "none";
+              submitBtn.textContent = originalText;
+              submitBtn.disabled = false;
+            }, 5000);
+          } else {
+            submitBtn.textContent = "Error — try again";
+            submitBtn.disabled = false;
+            setTimeout(function () {
+              submitBtn.textContent = originalText;
+            }, 3000);
+          }
+        })
+        .catch(function () {
+          submitBtn.textContent = "Error — try again";
+          submitBtn.disabled = false;
+          setTimeout(function () {
+            submitBtn.textContent = originalText;
+          }, 3000);
+        });
+    });
+  }
 })();
